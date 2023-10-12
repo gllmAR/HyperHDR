@@ -86,6 +86,7 @@ private:
 	uint8_t _artnet_seq = 1;
 	int _artnet_channelsPerFixture = 3;
 	int _artnet_universe = 1;
+	bool _restartColorIndexAtUniverseIncrement = 1;
 };
 
 #endif // LEDEVICEUDPARTNET_H

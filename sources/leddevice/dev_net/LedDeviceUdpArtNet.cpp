@@ -79,6 +79,21 @@ int LedDeviceUdpArtNet::write(const std::vector<ColorRgb>& ledValues)
 	memset(artnet_packet.raw, 0, sizeof(artnet_packet.raw));
 	for (unsigned int ledIdx = 0; ledIdx < _ledRGBCount; ledIdx++)
 	{
+		if (_restartColorIndexAtUniverseIncrement)
+		{
+			// Check if there's enough space in the current universe for all channels of the next LED
+        	if (dmxIdx + _artnet_channelsPerFixture > DMX_MAX)
+        	{
+            	// Prepare and send the current universe
+            	prepare(thisUniverse, _artnet_seq, dmxIdx);
+            	retVal &= writeBytes(18 + qMin(dmxIdx, DMX_MAX), artnet_packet.raw);
+
+            	// Move to the next universe and reset the DMX index
+            	memset(artnet_packet.raw, 0, sizeof(artnet_packet.raw));
+            	thisUniverse++;
+            	dmxIdx = 0;
+        	}
+		}
 
 		artnet_packet.Data[dmxIdx++] = rawdata[ledIdx];
 		if ((ledIdx % 3 == 2) && (ledIdx > 0))
